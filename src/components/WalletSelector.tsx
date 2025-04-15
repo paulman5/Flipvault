@@ -25,10 +25,12 @@ import { useToast } from "@/components/ui/use-toast"
 import {
   APTOS_CONNECT_ACCOUNT_URL,
   AboutAptosConnect,
-  type AboutAptosConnectEducationScreen,
-  type AnyAptosWallet,
+  AboutAptosConnectEducationScreen,
+  AdapterNotDetectedWallet,
+  AdapterWallet,
   AptosPrivacyPolicy,
   WalletItem,
+  WalletSortingOptions,
   groupAndSortWallets,
   isAptosConnectWallet,
   isInstallRequired,
@@ -45,7 +47,7 @@ import {
 } from "lucide-react"
 import { useCallback, useState } from "react"
 
-export function WalletSelector() {
+export function WalletSelector(walletSortingOptions: WalletSortingOptions) {
   const { account, connected, disconnect, wallet } = useWallet()
   const { toast } = useToast()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -55,7 +57,7 @@ export function WalletSelector() {
   const copyAddress = useCallback(async () => {
     if (!account?.address) return
     try {
-      await navigator.clipboard.writeText(account.address)
+      await navigator.clipboard.writeText(account.address.toString())
       toast({
         title: "Success",
         description: "Copied wallet address to clipboard.",
@@ -109,19 +111,26 @@ export function WalletSelector() {
           Connect Wallet to Mint
         </Button>
       </DialogTrigger>
-      <ConnectWalletDialog close={closeDialog} />
+      <ConnectWalletDialog close={closeDialog} {...walletSortingOptions} />
     </Dialog>
   )
 }
 
-interface ConnectWalletDialogProps {
+interface ConnectWalletDialogProps extends WalletSortingOptions {
   close: () => void
 }
 
-function ConnectWalletDialog({ close }: ConnectWalletDialogProps) {
-  const { wallets = [] } = useWallet()
+function ConnectWalletDialog({
+  close,
+  ...walletSortingOptions
+}: ConnectWalletDialogProps) {
+  const { wallets = [], notDetectedWallets = [] } = useWallet()
+
   const { aptosConnectWallets, availableWallets, installableWallets } =
-    groupAndSortWallets(wallets)
+    groupAndSortWallets(
+      [...wallets, ...notDetectedWallets],
+      walletSortingOptions
+    )
 
   const hasAptosConnectWallets = !!aptosConnectWallets.length
 
@@ -201,7 +210,7 @@ function ConnectWalletDialog({ close }: ConnectWalletDialogProps) {
 }
 
 interface WalletRowProps {
-  wallet: AnyAptosWallet
+  wallet: AdapterWallet | AdapterNotDetectedWallet
   onConnect?: () => void
 }
 

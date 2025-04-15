@@ -9,7 +9,7 @@ import { useWallet } from "@aptos-labs/wallet-adapter-react"
 
 export default function Home() {
   const maxSupply = 10000
-  const minted = 3768
+  const minted = 0
 
   const { account } = useWallet()
 

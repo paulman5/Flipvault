@@ -1,12 +1,17 @@
 "use client"
 import Image from "next/image"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import flipvault from "@/public/flipvault.png"
+import flipvaultlogo from "@/public/flipvaultlogo.png"
+import { WalletSelector } from "@/components/WalletSelector"
+import { useWallet } from "@aptos-labs/wallet-adapter-react"
 
 export default function Home() {
   const maxSupply = 10000
   const minted = 3768
+
+  const { account } = useWallet()
 
   return (
     <main className="min-h-screen bg-gradient-radial from-blue-950 via-blue-900 to-black overflow-hidden relative flex flex-col items-center justify-center">
@@ -80,10 +85,10 @@ export default function Home() {
               <div className="relative z-10 w-full h-full p-4">
                 <div className="w-full h-full relative bg-gradient-to-br from-blue-900/40 to-purple-900/40 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden">
                   <Image
-                    src="/placeholder.svg?height=500&width=500"
+                    src={flipvaultlogo}
                     alt="NFT preview"
-                    width={500}
-                    height={500}
+                    width={10000}
+                    height={10000}
                     className="object-cover w-full h-full"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-blue-900/90 via-blue-900/50 to-transparent flex items-end p-6">
@@ -119,16 +124,20 @@ export default function Home() {
                   </div>
 
                   <div className="flex justify-center items-center py-4">
-                    <span className="text-white font-medium text-xl">
-                      Free Mint
-                    </span>
+                    {account ? (
+                      <Button className="text-white font-medium text-base cursor-pointer bg-blue-500 hover:bg-blue-600">
+                        Mint NFT
+                      </Button>
+                    ) : (
+                      <span className="text-white font-medium text-xl">
+                        Free Mint
+                      </span>
+                    )}
                   </div>
                 </div>
               </CardContent>
               <CardFooter>
-                <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white py-6 text-lg font-medium cursor-pointer">
-                  Connect Wallet to Mint
-                </Button>
+                <WalletSelector />
               </CardFooter>
             </Card>
           </div>
